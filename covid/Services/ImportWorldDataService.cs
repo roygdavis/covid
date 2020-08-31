@@ -1,4 +1,5 @@
 ﻿using covid.Models;
+using CsvHelper.TypeConversion;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,22 +13,35 @@ namespace covid.Services
     public class ImportWorldDataService
     {
         private readonly HttpClient _client;
+        private readonly Db _db;
 
-        public ImportWorldDataService(HttpClient client)
+        public ImportWorldDataService(HttpClient client, Db db)
         {
             _client = client;
+            _db = db;
         }
 
-        public async void ImportWorldData()
+        public async Task ImportWorldData()
         {
-            var csvBytes = await _client.GetStringAsync("https://github.com/owid/covid-19-data/tree/master/public/data");
-            using (var stringReader = new StringReader(csvBytes))
+            try
             {
-                using (var csv = new CsvHelper.CsvReader(stringReader, CultureInfo.InvariantCulture))
+                var csvBytes = await _client.GetStringAsync("https://covid.ourworldindata.org/data/owid-covid-data.csv");
+                using (var stringReader = new StringReader(csvBytes))
                 {
-                    var parsedData = csv.GetRecordsAsync<CsvModel>();
-
+                    using (var csv = new CsvHelper.CsvReader(stringReader, CultureInfo.InvariantCulture))
+                    {
+                        //csv.Configuration.HasHeaderRecord = true;
+                        //csv.Configuration.PrepareHeaderForMatch = (s, i) => s.Trim();
+                        //csv.Configuration.BadDataFound = (c) => { Console.WriteLine(c.CurrentIndex); };
+                        //csv.Configuration.TypeConverterOptionsCache.GetOptions<DoubleConverter>().
+                        _db.Rows.AddRange(csv.GetRecords<CsvModel>());
+                        _db.SaveChanges();
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
     }

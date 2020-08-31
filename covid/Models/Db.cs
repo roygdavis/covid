@@ -14,5 +14,10 @@ namespace covid.Models
         }
         
         public DbSet<CsvModel> Rows { get; set; }
+
+        protected override  void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CsvModel>().HasKey(x => new { x.IsoCode, x.Continent, x.Location, x.Date });
+        }
     }
 }
