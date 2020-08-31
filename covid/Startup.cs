@@ -65,7 +65,7 @@ namespace covid
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "wwww";
 
                 if (env.IsDevelopment())
                 {
