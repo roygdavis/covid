@@ -8,6 +8,11 @@ namespace covid.Models
 {
     public class Db:DbContext
     {
+        public Db(DbContextOptions options):base(options)
+        {
+            
+        }
+        
         public DbSet<CsvModel> Rows { get; set; }
     }
 }

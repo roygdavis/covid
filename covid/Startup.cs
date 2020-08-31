@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace covid
 {
@@ -69,7 +70,7 @@ namespace covid
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "wwww";
+                spa.Options.SourcePath = Path.Join(env.ContentRootPath, "wwww");
 
                 if (env.IsDevelopment())
                 {
