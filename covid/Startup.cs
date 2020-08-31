@@ -1,3 +1,4 @@
+using covid.Models;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 namespace covid
 {
@@ -30,8 +32,10 @@ namespace covid
                 configuration.RootPath = "ClientApp/public";
             });
 
-            services.AddHangfire(x => x.UseSqlServerStorage("<connection string>"));
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("CovidDataContext")));
             services.AddHangfireServer();
+
+            services.AddDbContext<Db>(options => options.UseSqlServer(Configuration.GetConnectionString("CovidDataContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
