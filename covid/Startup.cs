@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using Microsoft.Extensions.Configuration.UserSecrets;
+using covid.Services;
 
 namespace covid
 {
@@ -24,7 +26,6 @@ namespace covid
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
 
             // In production, the React files will be served from this directory
@@ -37,10 +38,13 @@ namespace covid
             services.AddHangfireServer();
 
             services.AddDbContext<Db>(options => options.UseSqlServer(Configuration.GetConnectionString("CovidDataContext")));
+            services.AddHttpClient<ImportWorldDataService>();
+            //services.AddScoped<ImportWorldDataService>();
+            services.AddScoped<JobService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JobService jobService)
         {
             if (env.IsDevelopment())
             {
@@ -60,17 +64,19 @@ namespace covid
             app.UseRouting();
             
             app.UseHangfireDashboard();
+            app.UseHangfireServer();
+            jobService.ConfigureJobs();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "api/{controller}/{action=Index}/{id?}");
+                    pattern: "api/{controller}/{action}/{id?}");
             });
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = Path.Join(env.ContentRootPath, "wwww");
+                spa.Options.SourcePath = "ClientApp";// Path.Join(env.ContentRootPath, "wwww");
 
                 if (env.IsDevelopment())
                 {
