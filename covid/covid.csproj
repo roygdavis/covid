@@ -32,10 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="ClientApp\package-lock.json" />
     <None Include="ClientApp\package.json" />
     <None Include="ClientApp\public\manifest.json" />
